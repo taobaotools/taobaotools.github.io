@@ -50,7 +50,7 @@ function setComponents(isValid, array) {
     // Build HTML
     var html = '<h3>' + (isValid ? 'Valid' : 'Invalid') + '</h3>';
     for (var i = 0; i < array.length; i++) {
-        html += '<a href=\'' + array[i] + '\' target=\'_blank\'>' + array[i] + '</a>'
+        html += '<a class=\'link\' href=\'' + array[i] + '\' target=\'_blank\'>' + array[i] + '</a>'
     }
 
     // Set components

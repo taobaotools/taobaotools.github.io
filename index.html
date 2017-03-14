@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!--<meta name="viewport" content="width=device-width, initial-scale=1"/>-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Convert Taobao Mobile Links to their Desktop counterparts.">
     <meta name="keywords" content="taobao, taobao mobile, m.intl.taobao">
 
@@ -41,13 +41,13 @@
         <button id="invalid-copy" class="copybtn hidden" data-clipboard-action="copy" data-clipboard-target="#invalid-hidden" onclick="clicked(this)">Copy to clipboard</button>
 
         <form>
-            <textarea id="content" placeholder="Enter your links here."></textarea>
+            <textarea class='boxsizingBorder' id="content" placeholder="Enter your links here."></textarea>
         </form>
 
         <div id="actions">
             <button id="reset" onclick="reset()">Reset</button>
-            <div id="message"></div>
             <button id="convert" onclick="convert()">Convert</button>
+            <div id="message"></div>
         </div>
 
         <p class="smaller">
