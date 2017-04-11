@@ -118,8 +118,6 @@ function reset() {
     setHTML('message', '');
     setDisplay('valid', false);
     setDisplay('invalid', false);
-    setHTML('valid-message', '');
-    setHTML('invalid-message', '');
     setHTML('valid-copy', 'Copy to clipboard');
     setHTML('invalid-copy', 'Copy to clipboard');
 }
