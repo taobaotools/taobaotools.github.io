@@ -206,6 +206,16 @@ button:hover {
         line-height: 20px;
     }
 
+    #valid-copy, #invalid-copy {
+        width: 53.5% !important;
+    }
+
+    #valid-open, #invalid-open {
+        float: right;
+        margin-left: 0;
+        width: 43.5% !important;
+    }
+
     .actions {
         margin-top: 5px;
     }
