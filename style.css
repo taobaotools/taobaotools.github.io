@@ -149,11 +149,15 @@ button:hover {
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 3px 10px 0 rgba(0,0,0,0.19);
 }
 
-.copy-btn {
+.copy-btn, .open-btn {
     color: black;
     background-color: #E0E0E0;
     font-weight: 500;
     text-transform: none;
+}
+
+.open-btn {
+    margin-left: 5px;
 }
 
 #reset {
@@ -220,5 +224,9 @@ button:hover {
         margin-bottom: 15px;
         float: left;
         width: 100%;
+    }
+
+    .mobile-hide {
+        display: none;
     }
 }
