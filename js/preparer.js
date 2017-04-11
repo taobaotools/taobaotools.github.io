@@ -1,3 +1,6 @@
+const CONFIRM = 'WARNING! Are you sure you want to open these links? Since there are {} links, you ' +
+    'may temporarily experience some lag in your web browser';
+
 /**
  * Main convert function that is triggered when we click 'Convert'
  */
@@ -13,6 +16,23 @@ function convert() {
     // Build valid and invalid links
     setComponents(true, validLinks);
     setComponents(false, invalidLinks);
+
+    // Create event handlers for the 'Open Links' buttons
+    document.getElementById('valid-open').addEventListener('click', function () {
+        if (validLinks.length <= 10 || validLinks.length > 10 && confirm(CONFIRM.replace('{}', validLinks.length))) {
+            validLinks.forEach(function (link) {
+                window.open(link);
+            });
+        }
+    });
+
+    document.getElementById('invalid-open').addEventListener('click', function () {
+        if (invalidLinks.length <= 10 || invalidLinks.length > 10 && confirm(CONFIRM.replace('{}', invalidLinks.length))) {
+            invalidLinks.forEach(function (link) {
+                window.open(link);
+            });
+        }
+    });
 }
 
 
@@ -58,7 +78,7 @@ function linkOrLinks(count) {
  */
 function cleanArray(array) {
     var newArray = [];
-    array.forEach(function(elem) {
+    array.forEach(function (elem) {
         if (elem != '')
             newArray.push(elem);
     });
@@ -79,7 +99,7 @@ function setComponents(isValid, array) {
 
     // Build HTML
     var html = '';
-    array.forEach(function(link) {
+    array.forEach(function (link) {
         html += '<a href=\'' + link + '\' target=\'_blank\'>' + link + '</a><br>'
     });
 
@@ -98,6 +118,8 @@ function reset() {
     setHTML('message', '');
     setDisplay('valid', false);
     setDisplay('invalid', false);
+    setHTML('valid-message', '');
+    setHTML('invalid-message', '');
     setHTML('valid-copy', 'Copy to clipboard');
     setHTML('invalid-copy', 'Copy to clipboard');
 }
