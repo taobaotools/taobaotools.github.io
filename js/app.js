@@ -6,6 +6,7 @@ const ITEM_ID = 'id=';
 const ITEM = 'item/';
 const SHOP_ID = 'shop_id=';
 const TAOBAO_URL = 'https://item.taobao.com/item.htm?id=';
+const TMALL_URL = 'https://detail.tmall.com/item.htm?id=';
 const SHOP_URL = 'https://shop{}.taobao.com';
 const M_INTL = 'm.intl.taobao.com';
 const H5 = 'h5.m.taobao.com';
@@ -40,6 +41,12 @@ function convertURLs(urls) {
  * Given a valid, Taobao url we convert it into Chinese mainland form
  */
 function convertURL(str) {
+    // Handle tmall world link
+    if (contains(str, 'world.tmall.com')) {
+        id = getID(str, ITEM_ID);
+        return TMALL_URL + id;
+    }
+    // Handle Taobao links
     if (contains(str, M_INTL) || contains(str, H5)) {
         // Normal international or H5 app link
         return buildTaobaoURL(str, ITEM_ID, false)
@@ -105,7 +112,7 @@ function isTaobaoURL(str) {
         '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+
         '(\\?[;&a-z\\d%_.~+=-]*)?'+
         '(\\#[-a-z\\d_]*)?$','i');
-    return urlPattern.test(str) && str.indexOf('taobao.com') != -1;
+    return urlPattern.test(str) && (str.indexOf('taobao.com') != -1 || str.indexOf('tmall.com') != -1);
 }
 
 
