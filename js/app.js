@@ -12,6 +12,7 @@ const M_INTL = 'm.intl.taobao.com';
 const H5 = 'h5.m.taobao.com';
 const WORLD = 'world.taobao.com';
 const SHOP_M = 'shop.m.taobao.com';
+const SEARCH_QUERY = '/search.htm?search=y';
 
 /**
  * Given an array of URLs, separate them into valid and invalid ones, convert them and return
@@ -22,7 +23,7 @@ function convertURLs(urls) {
     var invalidLinks = [];
 
     // Go through each element of the parameter array and convert as required
-    urls.forEach(function(url) {
+    urls.forEach(function (url) {
         if (isTaobaoURL(url))
             validLinks.push(convertURL(url));
         else
@@ -31,8 +32,8 @@ function convertURLs(urls) {
 
     // Return object containing our valid links and invalid links array
     return {
-        valid : validLinks,
-        invalid : invalidLinks
+        valid: validLinks,
+        invalid: invalidLinks
     };
 }
 
@@ -42,28 +43,30 @@ function convertURLs(urls) {
  */
 function convertURL(str) {
     // Handle tmall world link
-    if (contains(str, 'world.tmall.com')) {
-        id = getID(str, ITEM_ID);
-        return TMALL_URL + id;
-    }
+    if (contains(str, 'world.tmall.com'))
+        return TMALL_URL + getID(str, ITEM_ID);
+
     // Handle Taobao links
     if (contains(str, M_INTL) || contains(str, H5)) {
         // Normal international or H5 app link
         return buildTaobaoURL(str, ITEM_ID, false)
     } else if (contains(str, WORLD)) {
         // world.taobao.com link
-        if (contains(str, 'item'))
+        if (contains(str, 'item')) {
             // World item
             return buildTaobaoURL(str, ITEM, false);
-        else
+        } else {
             // World store
-            return str.replace('world.taobao.com', 'taobao.com');
+            var intermediate = str.replace('world.taobao.com', 'taobao.com');
+            return cleanTaobaoStore(intermediate);
+        }
     } else if (contains(str, SHOP_M)) {
         // Mobile shop with shop ID
         return buildTaobaoURL(str, SHOP_ID, true);
     } else if (!contains(str, 'item')) {
-        // Most mobile shops
-        return str.replace('m.taobao.com', 'taobao.com');
+        // Clean the store link, remove any redundant information, and conevrt from mobile if relevant
+        // str.replace('m.taobao.com', 'taobao.com'); // MOBILE STORE
+        return cleanTaobaoStore(str);
     } else {
         // Already valid Taobao URL, canonacalise it
         return buildTaobaoURL(str, 'id=', false);
@@ -100,18 +103,35 @@ function buildTaobaoURL(str, match, isShop) {
     }
 }
 
+/**
+ * Clean a Taobao store search
+ */
+function cleanTaobaoStore(str) {
+    // Check if there are additional useless information variables
+    var end = str.indexOf('taobao.com/');
+    if (end == -1) {
+        return str;
+    } else {
+        end += 10;
+        if (contains(str, 'search.htm'))
+            return str.substring(0, end) + SEARCH_QUERY;
+        else
+            return str.substring(0, end);
+    }
+}
+
 
 /**
  * Given a string, we check and return if it is a valid Taobao URL or not
  */
 function isTaobaoURL(str) {
     // Define our Regex pattern and test the string
-    var urlPattern = new RegExp('^(https?:\\/\\/)?'+
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+
-        '((\\d{1,3}\\.){3}\\d{1,3}))'+
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+
-        '(\\?[;&a-z\\d%_.~+=-]*)?'+
-        '(\\#[-a-z\\d_]*)?$','i');
+    var urlPattern = new RegExp('^(https?:\\/\\/)?' +
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
+        '((\\d{1,3}\\.){3}\\d{1,3}))' +
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
+        '(\\?[;&a-z\\d%_.~+=-]*)?' +
+        '(\\#[-a-z\\d_]*)?$', 'i');
     return urlPattern.test(str) && (str.indexOf('taobao.com') != -1 || str.indexOf('tmall.com') != -1);
 }
 
