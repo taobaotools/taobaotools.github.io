@@ -55,16 +55,20 @@
             <h3>Valid Links</h3>
             <div id="valid-content"></div>
             <div id="valid-hidden"></div>
-            <button id="valid-copy" class="copy-btn" data-clipboard-action="copy" data-clipboard-target="#valid-hidden" onclick="clicked(this)">Copy to clipboard</button>
-            <button id="valid-open" class="open-btn">Open Links</button>
+            <div id="valid-actions">
+                <button id="valid-copy" class="copy-btn" data-clipboard-action="copy" data-clipboard-target="#valid-hidden" onclick="clicked(this)">Copy to clipboard</button>
+                <button id="valid-open" class="open-btn">Open Links</button>
+            </div>
         </div>
 
         <div id="invalid">
             <h3>Invalid Links</h3>
             <div id="invalid-content"></div>
             <div id="invalid-hidden"></div>
-            <button id="invalid-copy" class="copy-btn" data-clipboard-action="copy" data-clipboard-target="#invalid-hidden" onclick="clicked(this)">Copy to clipboard</button>
-            <button id="invalid-open" class="open-btn">Open Links</button>
+            <div id="invalid-actions">
+                <button id="invalid-copy" class="copy-btn" data-clipboard-action="copy" data-clipboard-target="#invalid-hidden" onclick="clicked(this)">Copy to clipboard</button>
+                <button id="invalid-open" class="open-btn">Open Links</button>
+            </div>
         </div>
 
         <div class="actions">
@@ -85,7 +89,7 @@
 <script>
     var clipboard = new Clipboard(document.getElementsByClassName('copy-btn'));
     function clicked(element) {
-        element.innerHTML = '<b>Copied!</b> Copy to clipboard'
+        element.innerHTML = '<b>Copied</b> to clipboard!'
     }
 </script>
 <script type="text/javascript" src="js/preparer.min.js"></script>
