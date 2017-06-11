@@ -1,14 +1,18 @@
 const CONFIRM = 'WARNING! Are you sure you want to open these links? Since there are {} links, you ' +
     'may temporarily experience some lag in your web browser';
 
+// Global variables for storing the links, not a very good idea...
+var validLinks;
+var invalidLinks;
+
 /**
  * Main convert function that is triggered when we click 'Convert'
  */
 function convert() {
     // Convert the links in the text area and place in arrays
     var links = convertURLs(document.getElementById('content').value.split('\n'));
-    var validLinks = links.valid;
-    var invalidLinks = cleanArray(links.invalid);
+    validLinks = links.valid;
+    invalidLinks = cleanArray(links.invalid);
 
     // Set Message for user
     setHTML('message', getStatus(validLinks.length, invalidLinks.length));
@@ -18,23 +22,28 @@ function convert() {
     setComponents(false, invalidLinks);
 
     // Create event handlers for the 'Open Links' buttons
-    document.getElementById('valid-open').addEventListener('click', function () {
+    document.getElementById('valid-open').addEventListener('click', openLinks);
+    document.getElementById('invalid-open').addEventListener('click', openLinks);
+}
+
+/**
+ * Open a list of links based on the event ID, prompting the user to confirm if there is more than 10
+ */
+function openLinks(e) {
+    if (e.target.id == 'invalid-open') {
+        if (invalidLinks.length <= 10 || invalidLinks.length > 10 && confirm(CONFIRM.replace('{}', invalidLinks.length))) {
+            invalidLinks.forEach(function (link) {
+                window.open(link);
+            });
+        }   
+    } else {
         if (validLinks.length <= 10 || validLinks.length > 10 && confirm(CONFIRM.replace('{}', validLinks.length))) {
             validLinks.forEach(function (link) {
                 window.open(link);
             });
         }
-    });
-
-    document.getElementById('invalid-open').addEventListener('click', function () {
-        if (invalidLinks.length <= 10 || invalidLinks.length > 10 && confirm(CONFIRM.replace('{}', invalidLinks.length))) {
-            invalidLinks.forEach(function (link) {
-                window.open(link);
-            });
-        }
-    });
+    }
 }
-
 
 /**
  * Change inner html of a DOM element
@@ -120,4 +129,7 @@ function reset() {
     setDisplay('invalid', false);
     setHTML('valid-copy', 'Copy to clipboard');
     setHTML('invalid-copy', 'Copy to clipboard');
+    // Remove event listeners for the 'open' buttons
+    document.getElementById('valid-open').removeEventListener('click', openLinks);
+    document.getElementById('invalid-open').removeEventListener('click', openLinks);
 }
