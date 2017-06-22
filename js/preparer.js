@@ -1,48 +1,69 @@
 const CONFIRM = 'WARNING! Are you sure you want to open these links? Since there are {} links, you ' +
     'may temporarily experience some lag in your web browser';
 
-// Global variables for storing the links, not a very good idea...
-var validLinks;
-var invalidLinks;
-
 /**
- * Main convert function that is triggered when we click 'Convert'
+ * Do everything
  */
-function convert() {
-    // Convert the links in the text area and place in arrays
-    var links = convertURLs(document.getElementById('content').value.split('\n'));
-    validLinks = links.valid;
-    invalidLinks = cleanArray(links.invalid);
+function load() {
+    // Read the query string
+    var url = getParameterByName('url');
+    if (url === null) {
+        setError('No URL specified.');
+        return;
+    }
 
-    // Set Message for user
-    setHTML('message', getStatus(validLinks.length, invalidLinks.length));
+    // Check and calculate the hash value to prevent users from requesting URLs themselves
+    var hash = getParameterByName('hash');
+    var id = url.split('/')[0];
+    var calculatedHash = 0;
+    for (var i = 0; i < id.length; i++)
+        calculatedHash += parseInt(id.charAt(i), 16);
+        
+    if (parseInt(hash) !== calculatedHash) {
+        setError('Incorrect hash value.');
+        return;
+    }
 
-    // Build valid and invalid links
-    setComponents(true, validLinks);
-    setComponents(false, invalidLinks);
+    // Add the gist forward URL
+    url = 'https://gist.githubusercontent.com/anonymous/' + url;
 
-    // Create event handlers for the 'Open Links' buttons
-    document.getElementById('valid-open').addEventListener('click', openLinks);
-    document.getElementById('invalid-open').addEventListener('click', openLinks);
+    // Get the valid links and read into a JSON variable
+    $.getJSON(url, function (data) {
+        display(data);
+    })
 }
 
 /**
- * Open a list of links based on the event ID, prompting the user to confirm if there is more than 10
+ * Display everything
  */
-function openLinks(e) {
-    if (e.target.id == 'invalid-open') {
-        if (invalidLinks.length <= 10 || invalidLinks.length > 10 && confirm(CONFIRM.replace('{}', invalidLinks.length))) {
-            invalidLinks.forEach(function (link) {
-                window.open(link);
-            });
-        }   
-    } else {
+function display(validLinks) {
+    if (validLinks.length === 0) {
+        setError('No links were found.');
+        return;
+    }
+
+    // Build valid links and create event listener
+    setComponents(validLinks);
+    document.getElementById('valid-open').addEventListener('click', function () {
         if (validLinks.length <= 10 || validLinks.length > 10 && confirm(CONFIRM.replace('{}', validLinks.length))) {
             validLinks.forEach(function (link) {
                 window.open(link);
             });
         }
-    }
+    });
+}
+
+
+/**
+ * Get query string parameters, credit to https://stackoverflow.com/a/901144
+ */
+function getParameterByName(name) {
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(window.location.href);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
 /**
@@ -52,7 +73,6 @@ function setHTML(elementName, html) {
     document.getElementById(elementName).innerHTML = html;
 }
 
-
 /**
  * Set display of html of a DOM element
  */
@@ -60,76 +80,27 @@ function setDisplay(elementName, visible) {
     document.getElementById(elementName).style.display = (visible ? 'unset' : 'none');
 }
 
-
 /**
- * Builds the status message at our given states based on the length of the arrays
+ * Set error
  */
-function getStatus(validLength, invalidLength) {
-    if (validLength + invalidLength == 0) {
-        return 'All the links are invalid.';
-    } else {
-        return 'Converted ' + validLength + linkOrLinks(validLength)
-            + ' Found ' + invalidLength + ' invalid' + linkOrLinks(invalidLength);
-    }
+function setError(message) {
+    setDisplay('loading-msg', false);
+    setHTML('message', 'Error! ' + message);
 }
-
-
-/**
- *  English Grammar to find whether we have a link or links
- */
-function linkOrLinks(count) {
-    return count == 1 ? ' link.' : ' links.';
-}
-
-
-/**
- * Clean up an array by removing all the empty string
- */
-function cleanArray(array) {
-    var newArray = [];
-    array.forEach(function (elem) {
-        if (elem != '')
-            newArray.push(elem);
-    });
-    return newArray;
-}
-
 
 /* Prepare components to show valid and invalid links */
-function setComponents(isValid, array) {
-    // Do not process empty array of lists
-    if (array.length == 0)
-        return;
-
-    // Set display of text area to false and show the built links
-    var id = isValid ? 'valid' : 'invalid';
-    setDisplay('content', false);
-    setDisplay(id, true);
-
+function setComponents(array) {
     // Build HTML
     var html = '';
     array.forEach(function (link) {
         html += '<a href=\'' + link + '\' target=\'_blank\'>' + link + '</a><br>'
     });
-
     // Set components
-    setHTML(id + '-content', html);
-    setHTML(id + '-hidden', html);
+    setDisplay('loading', false);
+    setHTML('valid-content', html);
+    setHTML('valid-hidden', html);
+    setDisplay('valid', true);
 }
 
-
-/**
- * Reset HTML elements on the web page
- */
-function reset() {
-    document.getElementById('content').value = '';
-    setDisplay('content', true);
-    setHTML('message', '');
-    setDisplay('valid', false);
-    setDisplay('invalid', false);
-    setHTML('valid-copy', 'Copy to clipboard');
-    setHTML('invalid-copy', 'Copy to clipboard');
-    // Remove event listeners for the 'open' buttons
-    document.getElementById('valid-open').removeEventListener('click', openLinks);
-    document.getElementById('invalid-open').removeEventListener('click', openLinks);
-}
+// Trigger when window is loaded
+window.onload = load();
