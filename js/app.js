@@ -43,7 +43,7 @@ function convertURLs(urls) {
  */
 function convertURL(str) {
     // Handle tmall world link
-    if (contains(str, 'world.tmall.com'))
+    if (contains(str, 'tmall.com'))
         return TMALL_URL + getID(str, ITEM_ID);
 
     // Handle Taobao links
